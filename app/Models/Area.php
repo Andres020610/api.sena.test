@@ -3,29 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Teacher;
+use App\Models\Course;
 
-class Apprentice extends Model
+class Area extends Model
 {
-    protected $fillable = ['name', 'email', 'cell_number', 'course_id', 'computer_id'];
+    // Campos que se pueden llenar masivamente
+    protected $fillable = ['name'];
 
-    // Listas blancas para controlar qué relaciones, filtros y ordenamientos se pueden usar
-    protected $allowIncluded = ['course', 'computer'];
-    protected $allowFilter = ['id', 'name', 'email', 'cell_number', 'course_id', 'computer_id'];
-    protected $allowSort = ['id', 'name', 'email', 'cell_number'];
+    // Listas de lo que se puede incluir, filtrar y ordenar
+    protected $allowIncluded = ['teachers', 'courses'];
+    protected $allowFilter = ['id', 'name'];
+    protected $allowSort = ['id', 'name'];
 
-    // Relación con el computador asignado al aprendiz
-    public function computer()
+    // Relación con los docentes
+    public function teachers()
     {
-        return $this->belongsTo(Computer::class);
+        return $this->hasMany(Teacher::class);
     }
 
-    // Relación con el curso al que pertenece el aprendiz
-    public function course()
+    // Relación con los cursos
+    public function courses()
     {
-        return $this->belongsTo(Course::class);
+        return $this->hasMany(Course::class);
     }
 
-    // Scope para incluir relaciones permitidas
+    // Para incluir relaciones en la consulta
     public function scopeIncluded($query)
     {
         if (empty($this->allowIncluded) || empty(request('included'))) return;
@@ -37,7 +40,7 @@ class Apprentice extends Model
         $query->with($relations);
     }
 
-    // Scope para filtrar resultados por columnas permitidas
+    // Para filtrar por campos específicos
     public function scopeFilter($query)
     {
         if (empty($this->allowFilter) || empty(request('filter'))) return;
@@ -50,7 +53,7 @@ class Apprentice extends Model
         }
     }
 
-    // Scope para ordenar resultados por columnas permitidas
+    // Para ordenar los resultados
     public function scopeSort($query)
     {
         if (empty($this->allowSort) || empty(request('sort'))) return;
@@ -68,7 +71,7 @@ class Apprentice extends Model
         }
     }
 
-    // Scope para paginar o traer todos los resultados
+    // Para paginar o traer todo
     public function scopeGetOrPaginate($query)
     {
         if (request('perPage')) {

@@ -10,8 +10,10 @@ class ComputerController extends Controller
     // Listar todos los registros
     public function index()
     {
-        $computers = Computer::all();
-        return response()->json($computers);
+        return \App\Models\Computer::included()
+            ->filter()
+            ->sort()
+            ->getOrPaginate();
     }
 
     // Guardar un registro

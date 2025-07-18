@@ -4,28 +4,41 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Apprentice extends Model
+class Course extends Model
 {
-    protected $fillable = ['name', 'email', 'cell_number', 'course_id', 'computer_id'];
+    // Campos que se pueden llenar masivamente
+    protected $fillable = ['course_number', 'day', 'area_id', 'training_center_id'];
 
-    // Listas blancas para controlar qué relaciones, filtros y ordenamientos se pueden usar
-    protected $allowIncluded = ['course', 'computer'];
-    protected $allowFilter = ['id', 'name', 'email', 'cell_number', 'course_id', 'computer_id'];
-    protected $allowSort = ['id', 'name', 'email', 'cell_number'];
+    // Listas de lo que se puede incluir, filtrar y ordenar
+    protected $allowIncluded = ['area', 'trainingCenter', 'teachers', 'apprentices'];
+    protected $allowFilter = ['id', 'course_number', 'day', 'area_id', 'training_center_id'];
+    protected $allowSort = ['id', 'course_number', 'day'];
 
-    // Relación con el computador asignado al aprendiz
-    public function computer()
+    // Relación con el área
+    public function area()
     {
-        return $this->belongsTo(Computer::class);
+        return $this->belongsTo(Area::class);
     }
 
-    // Relación con el curso al que pertenece el aprendiz
-    public function course()
+    // Relación con el centro de formación
+    public function trainingCenter()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(TrainingCenter::class);
     }
 
-    // Scope para incluir relaciones permitidas
+    // Relación con los docentes (muchos a muchos)
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'course_teacher');
+    }
+
+    // Relación con los aprendices
+    public function apprentices()
+    {
+        return $this->hasMany(Apprentice::class);
+    }
+
+    // Para incluir relaciones en la consulta
     public function scopeIncluded($query)
     {
         if (empty($this->allowIncluded) || empty(request('included'))) return;
@@ -37,7 +50,7 @@ class Apprentice extends Model
         $query->with($relations);
     }
 
-    // Scope para filtrar resultados por columnas permitidas
+    // Para filtrar por campos específicos
     public function scopeFilter($query)
     {
         if (empty($this->allowFilter) || empty(request('filter'))) return;
@@ -50,7 +63,7 @@ class Apprentice extends Model
         }
     }
 
-    // Scope para ordenar resultados por columnas permitidas
+    // Para ordenar los resultados
     public function scopeSort($query)
     {
         if (empty($this->allowSort) || empty(request('sort'))) return;
@@ -68,7 +81,7 @@ class Apprentice extends Model
         }
     }
 
-    // Scope para paginar o traer todos los resultados
+    // Para paginar o traer todo
     public function scopeGetOrPaginate($query)
     {
         if (request('perPage')) {

@@ -10,8 +10,10 @@ class ApprenticeController extends Controller
     // Listar todos los aprendices
     public function index()
     {
-        $apprentices = Apprentice::all();
-        return response()->json($apprentices);
+        return \App\Models\Apprentice::included()
+            ->filter()
+            ->sort()
+            ->getOrPaginate();
     }
 
     // Guardar un aprendiz
@@ -25,7 +27,7 @@ class ApprenticeController extends Controller
         //    'course_id' => 'required|exists:courses,id',
         //    'computer_id' => 'required|exists:computers,id',
       //  ]);
- 
+
 
         $apprentice = Apprentice::create($request->all());
         return response()->json($apprentice, 201);

@@ -3,26 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Teacher;
+use App\Models\Course;
 
-class Apprentice extends Model
+class TrainingCenter extends Model
 {
-    protected $fillable = ['name', 'email', 'cell_number', 'course_id', 'computer_id'];
+    protected $fillable = ['name', 'location'];
 
     // Listas blancas para controlar qué relaciones, filtros y ordenamientos se pueden usar
-    protected $allowIncluded = ['course', 'computer'];
-    protected $allowFilter = ['id', 'name', 'email', 'cell_number', 'course_id', 'computer_id'];
-    protected $allowSort = ['id', 'name', 'email', 'cell_number'];
+    protected $allowIncluded = ['teachers', 'courses'];
+    protected $allowFilter = ['id', 'name', 'location'];
+    protected $allowSort = ['id', 'name', 'location'];
 
-    // Relación con el computador asignado al aprendiz
-    public function computer()
+    // Relación con los docentes del centro de formación
+    public function teachers()
     {
-        return $this->belongsTo(Computer::class);
+        return $this->hasMany(Teacher::class);
     }
 
-    // Relación con el curso al que pertenece el aprendiz
-    public function course()
+    // Relación con los cursos del centro de formación
+    public function courses()
     {
-        return $this->belongsTo(Course::class);
+        return $this->hasMany(Course::class);
     }
 
     // Scope para incluir relaciones permitidas
